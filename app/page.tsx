@@ -1,37 +1,27 @@
-"use client";
-
-import { useState } from "react";
+// app/page.tsx
 import CompanyDropdown from "@/components/CompanyDropdown";
 import ClientTable from "@/components/ClientTable";
-import { mockCompanies } from "@/lib/simulatedData";
-import { Client } from "@/types";
+import { Company } from "@/types";
 
-function HomePage() {
-  const [selectedCompanyId, setSelectedCompanyId] = useState("");
+async function getCompanies(): Promise<Company[]> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies`, {
+    cache: "no-store",
+  });
 
-  const handleSelectCompany = (companyId: string) => {
-    setSelectedCompanyId(companyId);
-  };
+  if (!res.ok) {
+    throw new Error("Error al cargar las empresas");
+  }
 
-  const selectedCompany = mockCompanies.find(
-    (company) => company.id === selectedCompanyId
-  );
+  return res.json();
+}
 
-  const filteredClients: Client[] = selectedCompany?.clients ?? [];
+export default async function HomePage() {
+  const companies = await getCompanies();
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Gestión de Clientes</h1>
-
-      <CompanyDropdown
-        companies={mockCompanies}
-        selectedCompanyId={selectedCompanyId}
-        onSelectCompany={handleSelectCompany}
-      />
-
-      <ClientTable clients={filteredClients} />
+    <main className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Gestión de Clientes</h1>
+      <CompanyDropdown companies={companies} />
     </main>
   );
 }
-
-export default HomePage;
