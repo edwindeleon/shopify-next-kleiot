@@ -7,56 +7,116 @@ import { Client } from "@/types";
 function ClientTable() {
   const { selectedCompanyId } = useCompanyContext();
   const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  
+  const handleClientClick = (client: Client) => {
+    setSelectedClient(client);
+    setModalOpen(true);
+  };
 
-  useEffect(() => {
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedClient(null);
+  };
+
+  const fetchClients = async () => {
     if (!selectedCompanyId) {
       setClients([]);
       return;
     }
 
-    const fetchClients = async () => {
-      try {
-        const res = await fetch(`/api/companies/${selectedCompanyId}/clients`);
-        const data = await res.json();
-        setClients(data);
-      } catch (error) {
-        console.error("Error al cargar clientes:", error);
-      }
-    };
+    setLoading(true);
+    setError(null);
 
+    try {
+      const res = await fetch(`/api/companies/${selectedCompanyId}/clients`, {
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al cargar los clientes");
+      }
+
+      const data: Client[] = await res.json();
+      setClients(data);
+    } catch (err) {
+      setError((err as Error).message);
+      setClients([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchClients();
   }, [selectedCompanyId]);
 
+
   if (!selectedCompanyId) {
-    return <p className="text-gray-600">Seleccione una empresa para ver sus clientes.</p>;
+    return <p>Por favor, selecciona una compañía para ver sus clientes.</p>;
   }
 
-  if (clients.length === 0) {
-    return <p className="text-gray-600">No hay clientes disponibles para esta empresa.</p>;
-  }
-
+  if (loading) return <p>Cargando clientes...</p>;
+  if (error) return <p className="text-red-600">Error: {error}</p>;
+  if (!clients.length) return <p>No hay clientes para esta compañía.</p>;
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 border">
+    <>
+      <table className="min-w-full border border-gray-300 rounded-md">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Nombre</th>
-            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Email</th>
-            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Teléfono</th>
+            <th className="px-4 py-2 border-b">Nombre</th>
+            <th className="px-4 py-2 border-b">Email</th>
+            <th className="px-4 py-2 border-b">Teléfono</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody>
           {clients.map((client) => (
-            <tr key={client.id}>
-              <td className="px-4 py-2">{client.name}</td>
-              <td className="px-4 py-2">{client.email}</td>
-              <td className="px-4 py-2">{client.phone}</td>
+            <tr
+              key={client.id}
+              className="cursor-pointer hover:bg-gray-200"
+              onClick={() => handleClientClick(client)}
+            >
+              <td className="px-4 py-2 border-b">{client.name}</td>
+              <td className="px-4 py-2 border-b">{client.email}</td>
+              <td className="px-4 py-2 border-b">{client.phone ?? "N/A"}</td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
+
+      {modalOpen && selectedClient && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={handleCloseModal}
+        >
+          <div
+            className="bg-white rounded-lg p-6 max-w-md w-full shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-semibold mb-4">Detalles del Cliente</h2>
+            <p>
+              <strong>Nombre:</strong> {selectedClient.name}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedClient.email}
+            </p>
+            <p>
+              <strong>Teléfono:</strong> {selectedClient.phone ?? "N/A"}
+            </p>
+            <button
+              onClick={handleCloseModal}
+              className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
