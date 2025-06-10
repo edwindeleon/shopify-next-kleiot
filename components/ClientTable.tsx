@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useCompanyContext } from "@/context/CompanyContext";
 import { Client } from "@/types";
+import {
+  TextField,
+} from "@mui/material";
 
 function ClientTable() {
   const { selectedCompanyId } = useCompanyContext();
@@ -11,6 +14,7 @@ function ClientTable() {
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   
   const handleClientClick = (client: Client) => {
     setSelectedClient(client);
@@ -54,6 +58,13 @@ function ClientTable() {
     fetchClients();
   }, [selectedCompanyId]);
 
+    const normalize = (str: string) =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+    const filteredClients = clients.filter((client) =>
+    normalize(`${client.name} ${client.email} ${client.phone}`).includes(normalize(searchTerm))
+    );
+
 
   if (!selectedCompanyId) {
     return <p>Por favor, selecciona una compañía para ver sus clientes.</p>;
@@ -65,6 +76,15 @@ function ClientTable() {
 
   return (
     <>
+    <TextField
+        label="Buscar cliente"
+        variant="outlined"
+        fullWidth
+        size="small"
+        className="mb-4"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       <table className="min-w-full border border-gray-300 rounded-md">
         <thead className="bg-gray-100">
           <tr>
@@ -74,7 +94,7 @@ function ClientTable() {
           </tr>
         </thead>
         <tbody>
-          {clients.map((client) => (
+          {filteredClients.map((client) => (
             <tr
               key={client.id}
               className="cursor-pointer hover:bg-gray-200"
