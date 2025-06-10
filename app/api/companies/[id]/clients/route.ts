@@ -6,17 +6,13 @@ import { NextResponse } from "next/server";
 import { mockCompanies } from "@/lib/simulatedData";
 
 export async function GET(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const companyId = params.id;
-  const company = mockCompanies.find((c) => c.id === companyId);
+  const company = mockCompanies.find((c) => c.id === params.id);
 
   if (!company) {
-    return NextResponse.json(
-      { error: "Compañía no encontrada" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Company not found" }, { status: 404 });
   }
 
   return NextResponse.json(company.clients);

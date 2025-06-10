@@ -2,31 +2,29 @@
 // Componente para el dropdown de las compañias
 
 "use client";
-
 import { Company } from "@/types";
-import { useState } from "react";
-import ClientTable from "./ClientTable";
+import { useCompanyContext } from "@/context/CompanyContext";
 
-type Props = {
+type CompanyDropdownProps = {
   companies: Company[];
 };
 
-export default function CompanyDropdown({ companies }: Props) {
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+export default function CompanyDropdown({ companies }: CompanyDropdownProps) {
+  const { selectedCompanyId, setSelectedCompanyId } = useCompanyContext();
 
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCompanyId(event.target.value);
+  }
   return (
-    <div>
       <div className="mb-4">
         <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
           Seleccione una Empresa
         </label>
         <select
-          id="company"
-          onChange={(e) => {
-            const selected = companies.find((c) => c.id === e.target.value) || null;
-            setSelectedCompany(selected);
-          }}
-          className="block w-full p-2 border border-gray-300 rounded-md"
+          id="company-select"
+          value={selectedCompanyId}
+          onChange={handleChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
         >
           <option value="">-- Seleccionar --</option>
           {companies.map((company) => (
@@ -36,10 +34,6 @@ export default function CompanyDropdown({ companies }: Props) {
           ))}
         </select>
       </div>
-
-      {selectedCompany && (
-        <ClientTable clients={selectedCompany.clients} />
-      )}
-    </div>
   );
 }
+
