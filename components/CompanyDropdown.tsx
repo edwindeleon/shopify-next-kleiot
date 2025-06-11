@@ -37,20 +37,35 @@ export default function CompanyDropdown() {
         <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
           Seleccione una Empresa
         </label>
-        <select
-          id="company"
-          value={selectedCompanyId}
-          onChange={(e) => setSelectedCompanyId(e.target.value)}
-          disabled={loading}
-          className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-        >
-          <option value="">-- Seleccionar --</option>
-          {companies.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
+        <div className="relative w-1/2">
+          <select
+            id="company"
+            value={selectedCompanyId}
+            onChange={(e) => setSelectedCompanyId(e.target.value)}
+            disabled={loading}
+            className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm appearance-none"
+          >
+            <option value="">-- Seleccionar --</option>
+            {companies.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+
+          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       </div>
   );

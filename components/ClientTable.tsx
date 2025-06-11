@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Eye } from "lucide-react";
 import { useCompanyContext } from "@/context/CompanyContext";
 import { Client } from "@/types";
 import {
@@ -74,6 +75,21 @@ console.log('clients array', filteredClients)
   if (error) return <p className="text-red-600">Error: {error}</p>;
   if (!clients.length) return <p>No hay clientes para esta compañía.</p>;
 
+  const tableCellStyle: React.CSSProperties = {
+   padding: '5px 25px', // Padding horizontal de 15px
+    fontSize: '13px'
+  };
+  const tableStyle: React.CSSProperties = {
+    width: '100%',
+    borderCollapse: 'collapse'
+  };
+
+  const thStyle: React.CSSProperties = {
+    padding: '10px 25px',
+    textAlign: 'left',
+    backgroundColor: '#f2f2f2',
+    fontSize: '14px'
+  };
   return (
     <>
     <TextField
@@ -85,24 +101,33 @@ console.log('clients array', filteredClients)
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <table className="min-w-full border border-gray-300 rounded-md">
+      <table style={tableStyle} className="min-w-full border border-gray-300 rounded-md">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border-b">Nombre</th>
-            <th className="px-4 py-2 border-b">Email</th>
-            <th className="px-4 py-2 border-b">Teléfono</th>
+            <th style={thStyle}>Nombre</th>
+            <th style={thStyle}>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {filteredClients.map((client) => (
+          {filteredClients.map((client, index) => (
             <tr
               key={client.id}
               className="cursor-pointer hover:bg-gray-200"
               onClick={() => handleClientClick(client)}
+              style={{
+                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#f2f2f2'
+                }}
             >
-              <td className="px-4 py-2 border-b">{client.name}</td>
-              <td className="px-4 py-2 border-b">{client.email}</td>
-              <td className="px-4 py-2 border-b">{client.phone ?? "N/A"}</td>
+              <td style={tableCellStyle}>{client.name}</td>
+              <td style={tableCellStyle}>
+                <button
+                    onClick={() => handleClientClick(client)}
+                    className="text-green-600 hover:text-green-800"
+                    title="Ver detalles"
+                    >
+                    <Eye size={20} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
