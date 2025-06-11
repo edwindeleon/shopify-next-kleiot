@@ -36,16 +36,16 @@ function ClientTable() {
     setError(null);
 
     try {
-      const res = await fetch(`/api/companies/${selectedCompanyId}/clients`, {
+      const response = await fetch(`/api/customers?company=${encodeURIComponent(selectedCompanyId)}`, {
         cache: "no-store",
       });
 
-      if (!res.ok) {
+      if (!response.ok) {
         throw new Error("Error al cargar los clientes");
       }
 
-      const data: Client[] = await res.json();
-      setClients(data);
+      const data = await response.json();
+      setClients(data.clients);
     } catch (err) {
       setError((err as Error).message);
       setClients([]);
@@ -65,7 +65,7 @@ function ClientTable() {
     normalize(`${client.name} ${client.email} ${client.phone}`).includes(normalize(searchTerm))
     );
 
-
+console.log('clients array', filteredClients)
   if (!selectedCompanyId) {
     return <p>Por favor, selecciona una compañía para ver sus clientes.</p>;
   }
