@@ -4,9 +4,13 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 First, you must need to create te file .env.local with the follow vars
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
+
 NEXT_ADMIN_EMAIL=edwin@kleiotechnology.com
+
 NEXT_ADMIN_PASSWORD=admin123
+
 SHOPIFY_ACCESS_TOKEN=shpat_xxxxxxxxxxxxxxxxx (please ask for it)
+
 SHOPIFY_STORE_DOMAIN=ifkub1-8y.myshopify.com
 
 Seccond, run the development server:
